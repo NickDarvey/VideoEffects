@@ -7,7 +7,7 @@ using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
 using Windows.UI;
 
-namespace ChromaKey
+namespace NickDarvey.ChromaKey
 {
     public sealed class ChromaKeyMediaExtension : IMediaExtension
     {

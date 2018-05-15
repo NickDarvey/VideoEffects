@@ -5,7 +5,7 @@ using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
 
-namespace ChromaKey
+namespace NickDarvey.ChromaKey
 {
     /// <summary>
     /// Chroma key compositor
