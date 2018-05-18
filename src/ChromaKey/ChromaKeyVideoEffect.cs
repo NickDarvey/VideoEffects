@@ -17,7 +17,7 @@ namespace NickDarvey.ChromaKey
         /// <summary>
         /// Gets the optional background canvas to render
         /// </summary>
-        public BitmapDecoder Background { get; private set; } = default;
+        public BitmapDecoder Background { get; private set; } = default(BitmapDecoder);
 
         /// <summary>
         /// Gets a value indicating whether the video effect will modify the contents of the input frame.
@@ -35,7 +35,7 @@ namespace NickDarvey.ChromaKey
         /// </summary>
         public MediaMemoryTypes SupportedMemoryTypes { get; } = MediaMemoryTypes.Gpu;
 
-        private ICanvasImage BackgroundImage { get; set; } = default;
+        private ICanvasImage BackgroundImage { get; set; } = default(ICanvasImage);
 
         public void ProcessFrame(ProcessVideoFrameContext context)
         {
