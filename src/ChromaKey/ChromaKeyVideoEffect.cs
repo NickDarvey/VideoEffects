@@ -36,6 +36,7 @@ namespace NickDarvey.ChromaKey
             using (var ds = renderTarget.CreateDrawingSession())
             using (var chromaKeyEffect = MediaExtension.CreateChromaKeyEffect(inputBitmap))
             {
+                ds.Blend = CanvasBlend.Copy;
                 ds.DrawImage(chromaKeyEffect);
             }
         }
