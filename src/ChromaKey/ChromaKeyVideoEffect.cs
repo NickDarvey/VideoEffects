@@ -1,23 +1,15 @@
 ﻿using Microsoft.Graphics.Canvas;
-using System;
 using System.Collections.Generic;
 using Windows.Foundation.Collections;
 using Windows.Graphics.DirectX.Direct3D11;
-using Windows.Graphics.Imaging;
 using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
-using Windows.UI;
 
 namespace NickDarvey.ChromaKey
 {
     public sealed class ChromaKeyVideoEffect : IBasicVideoEffect
     {
         private readonly ChromaKeyMediaExtension MediaExtension = new ChromaKeyMediaExtension();
-
-        /// <summary>
-        /// Gets the optional background canvas to render
-        /// </summary>
-        public BitmapDecoder Background { get; private set; } = default(BitmapDecoder);
 
         /// <summary>
         /// Gets a value indicating whether the video effect will modify the contents of the input frame.
@@ -35,7 +27,7 @@ namespace NickDarvey.ChromaKey
         /// </summary>
         public MediaMemoryTypes SupportedMemoryTypes { get; } = MediaMemoryTypes.Gpu;
 
-        private ICanvasImage BackgroundImage { get; set; } = default(ICanvasImage);
+        //private ICanvasImage[] BackgroundImages { get; set; } = default(ICanvasImage[]);
 
         public void ProcessFrame(ProcessVideoFrameContext context)
         {
@@ -44,9 +36,6 @@ namespace NickDarvey.ChromaKey
             using (var ds = renderTarget.CreateDrawingSession())
             using (var chromaKeyEffect = MediaExtension.CreateChromaKeyEffect(inputBitmap))
             {
-                if (Background == null) ds.FillRectangle(inputBitmap.Bounds, Colors.Black);
-                else ds.DrawImage(BackgroundImage);
-
                 ds.DrawImage(chromaKeyEffect);
             }
         }
@@ -54,11 +43,8 @@ namespace NickDarvey.ChromaKey
         public void SetEncodingProperties(VideoEncodingProperties encodingProperties, IDirect3DDevice device) =>
            MediaExtension.SetEncodingProperties(encodingProperties, device);
 
-        public void Close(MediaEffectClosedReason reason)
-        {
-            BackgroundImage?.Dispose();
+        public void Close(MediaEffectClosedReason reason) =>
             MediaExtension.Close(reason);
-        }
 
         public void DiscardQueuedFrames() =>
             MediaExtension.DiscardQueuedFrames();
@@ -69,24 +55,6 @@ namespace NickDarvey.ChromaKey
         public void SetProperties(IPropertySet configuration)
         {
             MediaExtension.SetProperties(configuration);
-
-            if (configuration.TryGetValue(nameof(Background), out var background))
-            {
-                Background = (BitmapDecoder)background;
-
-                var props = MediaExtension.EncodingProperties;
-
-                using (var bitmap = Background.GetSoftwareBitmapAsync(
-                    BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Premultiplied,
-                    new BitmapTransform { ScaledHeight = props.Height, ScaledWidth = props.Width, InterpolationMode = BitmapInterpolationMode.Fant },
-                    ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage).AsTask().GetAwaiter().GetResult())
-                {
-                    BackgroundImage?.Dispose();
-                    BackgroundImage = CanvasBitmap.CreateFromSoftwareBitmap(MediaExtension.Device, bitmap);
-                }
-            }
         }
     }
 }
