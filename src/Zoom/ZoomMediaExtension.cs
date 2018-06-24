@@ -1,37 +1,22 @@
 ﻿using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
+using System.Numerics;
 using Windows.Foundation.Collections;
 using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Media;
 using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
-using Windows.UI;
 
 namespace NickDarvey.VideoEffects
 {
-    public sealed class ChromaKeyMediaExtension : IMediaExtension
+    public sealed class ZoomMediaExtension : IMediaExtension
     {
         #region Properties
 
         /// <summary>
-        /// Gets the chroma-key color
+        /// Gets the scale of the zoom effect
         /// </summary>
-        public Color Color { get; private set; } = Colors.Black;
-
-        /// <summary>
-        /// Gets a value indicating whether to feather the edges of the chroma key
-        /// </summary>
-        public bool Feather { get; private set; } = false;
-
-        /// <summary>
-        /// Gets the color tolerance 
-        /// </summary>
-        public float Tolerance { get; private set; } = 0.1f;
-
-        /// <summary>
-        /// Gets a value indicating whether to invert the alpha transparency
-        /// </summary>
-        public bool InvertAlpha { get; private set; } = false;
+        public float Scale { get; private set; } = 1f;
 
         /// <summary>
         /// Gets a value indicating whether the compositor is time-independent
@@ -53,21 +38,18 @@ namespace NickDarvey.VideoEffects
 
         #region Constructors
 
-        internal ChromaKeyMediaExtension() { }
+        internal ZoomMediaExtension() { }
 
         #endregion
 
 
         #region Methods
 
-        internal ChromaKeyEffect CreateChromaKeyEffect(CanvasBitmap inputBitmap) => new ChromaKeyEffect
+        public Matrix3x2 CreateTransform(CanvasBitmap inputBitmap)
         {
-            Source = inputBitmap,
-            Color = Color,
-            Feather = Feather,
-            Tolerance = Tolerance,
-            InvertAlpha = InvertAlpha
-        };
+            var centerPoint = inputBitmap.Size.ToVector2() / 2;
+            return Matrix3x2.CreateScale(Scale, centerPoint);
+        }
 
         /// <summary>
         /// Sets the properties passed into the compositor
@@ -80,24 +62,9 @@ namespace NickDarvey.VideoEffects
                 return;
             }
 
-            if (configuration.TryGetValue(nameof(Color), out var color))
+            if (configuration.TryGetValue(nameof(Scale), out var scale))
             {
-                Color = (Color)color;
-            }
-
-            if (configuration.TryGetValue(nameof(Tolerance), out var tolerance))
-            {
-                Tolerance = (float)tolerance;
-            }
-
-            if (configuration.TryGetValue(nameof(Feather), out var feather))
-            {
-                Feather = (bool)feather;
-            }
-
-            if (configuration.TryGetValue(nameof(InvertAlpha), out var invertAlpha))
-            {
-                InvertAlpha = (bool)invertAlpha;
+                Scale = (float)scale;
             }
         }
 

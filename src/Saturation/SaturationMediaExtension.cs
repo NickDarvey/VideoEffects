@@ -5,33 +5,17 @@ using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Media;
 using Windows.Media.Effects;
 using Windows.Media.MediaProperties;
-using Windows.UI;
 
 namespace NickDarvey.VideoEffects
 {
-    public sealed class ChromaKeyMediaExtension : IMediaExtension
+    public sealed class SaturationMediaExtension : IMediaExtension
     {
         #region Properties
 
         /// <summary>
-        /// Gets the chroma-key color
+        /// Gets the intensity of the saturation effect
         /// </summary>
-        public Color Color { get; private set; } = Colors.Black;
-
-        /// <summary>
-        /// Gets a value indicating whether to feather the edges of the chroma key
-        /// </summary>
-        public bool Feather { get; private set; } = false;
-
-        /// <summary>
-        /// Gets the color tolerance 
-        /// </summary>
-        public float Tolerance { get; private set; } = 0.1f;
-
-        /// <summary>
-        /// Gets a value indicating whether to invert the alpha transparency
-        /// </summary>
-        public bool InvertAlpha { get; private set; } = false;
+        public float Intensity { get; private set; } = 0.5f;
 
         /// <summary>
         /// Gets a value indicating whether the compositor is time-independent
@@ -53,20 +37,17 @@ namespace NickDarvey.VideoEffects
 
         #region Constructors
 
-        internal ChromaKeyMediaExtension() { }
+        internal SaturationMediaExtension() { }
 
         #endregion
 
 
         #region Methods
 
-        internal ChromaKeyEffect CreateChromaKeyEffect(CanvasBitmap inputBitmap) => new ChromaKeyEffect
+        internal SaturationEffect CreateEffect(CanvasBitmap inputBitmap) => new SaturationEffect
         {
             Source = inputBitmap,
-            Color = Color,
-            Feather = Feather,
-            Tolerance = Tolerance,
-            InvertAlpha = InvertAlpha
+            Saturation = Intensity
         };
 
         /// <summary>
@@ -80,24 +61,9 @@ namespace NickDarvey.VideoEffects
                 return;
             }
 
-            if (configuration.TryGetValue(nameof(Color), out var color))
+            if (configuration.TryGetValue(nameof(Intensity), out var intensity))
             {
-                Color = (Color)color;
-            }
-
-            if (configuration.TryGetValue(nameof(Tolerance), out var tolerance))
-            {
-                Tolerance = (float)tolerance;
-            }
-
-            if (configuration.TryGetValue(nameof(Feather), out var feather))
-            {
-                Feather = (bool)feather;
-            }
-
-            if (configuration.TryGetValue(nameof(InvertAlpha), out var invertAlpha))
-            {
-                InvertAlpha = (bool)invertAlpha;
+                Intensity = (float)intensity;
             }
         }
 
